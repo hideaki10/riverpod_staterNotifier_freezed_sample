@@ -14,17 +14,15 @@ import 'package:riverpod_state_notifier_freezed_sample/models/todos_state.dart';
 //詳細は https://github.com/rrousselGit/river_pod/issues/341
 final todoListProvider = StateNotifierProvider<TodoListController, TodosState>(
   (ref) {
-    final colorState = ref.watch(settingsProvider);
-    return TodoListController(color: colorState.color);
+    return TodoListController();
   },
 );
 
 class TodoListController extends StateNotifier<TodosState> {
-  TodoListController({this.color}) : super(const TodosState.loading()) {
+  TodoListController() : super(const TodosState.loading()) {
     //初期化
     _fetchTodoList();
   }
-  final Color? color;
 
   //Repsitoryからデータ取得処理
   //ない場合、stateをloadingに変更
@@ -38,25 +36,31 @@ class TodoListController extends StateNotifier<TodosState> {
     }
   }
 
-  //変更なし
+  //colorStateを直接参照する
   Future<void> addTodo(BuildContext context) async {
     var description = '';
 
     final result = await showDialog<bool?>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          content: TextFormField(
-            cursorColor: color,
-            autofocus: true,
-            onChanged: (value) => description = value,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text('追加', style: TextStyle(color: color)),
-            ),
-          ],
+        return Consumer(
+          builder: (BuildContext context,
+              T Function<T>(ProviderBase<Object?, T>) watch, Widget? child) {
+            final colorState = watch(settingsProvider);
+            return AlertDialog(
+              content: TextFormField(
+                cursorColor: colorState.color,
+                autofocus: true,
+                onChanged: (value) => description = value,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text('追加', style: TextStyle(color: colorState.color)),
+                ),
+              ],
+            );
+          },
         );
       },
     );

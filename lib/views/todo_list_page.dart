@@ -22,6 +22,7 @@ class TodoListPage extends ConsumerWidget {
     final todoListState = watch(todoListProvider);
     // todoListControllerを取得する
     final todoListController = watch(todoListProvider.notifier);
+    final colorState = watch(settingsProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('TODO')),
@@ -59,7 +60,7 @@ class TodoListPage extends ConsumerWidget {
                 onDismissed: (direction) {
                   todoListController.removeTodo(todo);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('[${todo.description}]を完了しました！'),
+                    content: Text('${todo.description}を完了しました！'),
                   ));
                 },
                 background: Container(
@@ -78,7 +79,7 @@ class TodoListPage extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: todoListController.color,
+                      color: colorState.color,
                     ),
                   ),
                 ),
